@@ -1,7 +1,6 @@
 import streamlit as st
-import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 import io
 import time
 
@@ -21,20 +20,13 @@ html, body, [class*="css"] { font-family: 'Sora', sans-serif; background: #080C1
 .block-container { padding: 0 !important; max-width: 100% !important; }
 #MainMenu, footer, header { visibility: hidden; }
 .stDeployButton { display: none; }
-
-.hero {
-    background: #0D1320;
-    border-bottom: 1px solid #1E2D4A;
-    padding: 2rem 3rem 1.5rem;
-}
+.hero { background: #0D1320; border-bottom: 1px solid #1E2D4A; padding: 2rem 3rem 1.5rem; }
 .hero-badge {
     display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(59,130,246,0.12);
-    border: 1px solid rgba(59,130,246,0.25);
-    border-radius: 20px; padding: 4px 14px;
-    font-size: 11px; font-family: 'Space Mono', monospace;
-    color: #60A5FA; letter-spacing: 0.08em;
-    text-transform: uppercase; margin-bottom: 0.8rem;
+    background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.25);
+    border-radius: 20px; padding: 4px 14px; font-size: 11px;
+    font-family: 'Space Mono', monospace; color: #60A5FA;
+    letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.8rem;
 }
 .hero-badge span { width:6px; height:6px; border-radius:50%; background:#3B82F6; animation:pulse 2s infinite; }
 .hero-title {
@@ -45,54 +37,25 @@ html, body, [class*="css"] { font-family: 'Sora', sans-serif; background: #080C1
     background-clip: text; margin-bottom: 0.4rem;
 }
 .hero-sub { font-size: 0.88rem; color: #6B7FA3; font-weight: 300; }
-
 .stats-row {
     display: flex; gap: 1rem; padding: 1rem 3rem;
     border-bottom: 1px solid #1E2D4A; background: #0A0F1C;
 }
 .stat-pill {
-    display: flex; align-items: center; gap: 8px;
-    padding: 5px 12px; background: #111827;
-    border: 1px solid #1E2D4A; border-radius: 8px;
+    display: flex; align-items: center; gap: 8px; padding: 5px 12px;
+    background: #111827; border: 1px solid #1E2D4A; border-radius: 8px;
     font-size: 12px; color: #6B7FA3;
 }
 .stat-pill strong { color: #93C5FD; font-family: 'Space Mono', monospace; font-size: 12px; }
-
 .panel { padding: 1.5rem 2rem; border-right: 1px solid #1E2D4A; }
 .panel-right { border-right: none; }
 .panel-label {
     font-size: 10px; font-family: 'Space Mono', monospace;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: #3B82F6; margin-bottom: 0.8rem;
-    display: flex; align-items: center; gap: 8px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: #3B82F6;
+    margin-bottom: 0.8rem; display: flex; align-items: center; gap: 8px;
 }
-.panel-label::after {
-    content: ''; flex: 1; height: 1px;
-    background: linear-gradient(90deg, #1E2D4A, transparent);
-}
-
-/* ── Image container — medium size ── */
-.img-wrap {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 0.8rem;
-}
-.img-wrap img {
-    max-width: 380px !important;
-    width: 100% !important;
-    border-radius: 10px !important;
-    border: 1px solid #1E2D4A !important;
-}
-div[data-testid="stImage"] {
-    display: flex;
-    justify-content: center;
-}
-div[data-testid="stImage"] img {
-    max-width: 380px !important;
-    border-radius: 10px !important;
-    border: 1px solid #1E2D4A !important;
-}
-
+.panel-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, #1E2D4A, transparent); }
+div[data-testid="stImage"] img { max-width: 380px !important; border-radius: 10px !important; border: 1px solid #1E2D4A !important; }
 .result-card { border-radius: 12px; padding: 1.2rem; margin-bottom: 1rem; }
 .result-card.success { background: #051B11; border: 1px solid rgba(34,197,94,0.25); }
 .result-card.fail    { background: #1A0A0A; border: 1px solid rgba(239,68,68,0.25); }
@@ -103,30 +66,25 @@ div[data-testid="stImage"] img {
 .result-status.bad  { color: #F87171; }
 .result-status.wait { color: #4A5F80; }
 .result-sub { font-size: 0.80rem; color: #4A5F80; }
-
 .conf-row { display:flex; align-items:center; justify-content:space-between; margin:0.8rem 0 0.3rem; }
 .conf-label { font-size:11px; color:#6B7FA3; font-family:'Space Mono',monospace; }
 .conf-value { font-size:13px; font-weight:600; color:#4ADE80; font-family:'Space Mono',monospace; }
 .conf-track { height:4px; background:#1E2D4A; border-radius:2px; overflow:hidden; }
 .conf-fill  { height:100%; border-radius:2px; background:linear-gradient(90deg,#22C55E,#4ADE80); }
-
 .meta-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:0.8rem; }
 .meta-item { background:#080C14; border:1px solid #1A2540; border-radius:8px; padding:8px 10px; }
 .meta-key  { font-size:10px; color:#3D4F6E; font-family:'Space Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:3px; }
 .meta-val  { font-size:12px; font-weight:500; color:#93C5FD; }
-
 div[data-testid="stFileUploader"] > div {
     background: #0D1320 !important; border: 1.5px dashed #1E2D4A !important;
     border-radius: 12px !important; padding: 1.5rem !important;
 }
 div[data-testid="stFileUploader"] > div:hover { border-color: #3B82F6 !important; }
 div[data-testid="stFileUploader"] label { display: none !important; }
-
 button[kind="primary"] {
     background: linear-gradient(135deg, #2563EB, #4F46E5) !important;
-    border: none !important; color: white !important;
-    border-radius: 8px !important; font-weight: 600 !important;
-    box-shadow: 0 4px 20px rgba(37,99,235,0.3) !important;
+    border: none !important; color: white !important; border-radius: 8px !important;
+    font-weight: 600 !important; box-shadow: 0 4px 20px rgba(37,99,235,0.3) !important;
 }
 button[kind="secondary"] {
     background: transparent !important; border: 1px solid #1E2D4A !important;
@@ -141,64 +99,75 @@ hr { border-color: #1E2D4A !important; margin: 1rem 0 !important; }
 """, unsafe_allow_html=True)
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
-YELLOW = (0, 220, 220)
-WHITE  = (255, 255, 255)
-BLACK  = (0,   0,   0)
-FONT   = cv2.FONT_HERSHEY_DUPLEX
+# ── Drawing helpers (Pillow only — no cv2) ────────────────────────────────────
 
-
-def load_model(path):
-    try:
-        from ultralytics import YOLO
-        return YOLO(path)
-    except Exception:
-        return None
-
-
-def draw_single_box(image: np.ndarray, box, conf: float) -> np.ndarray:
-    """Draw ONE bounding box — the highest confidence detection only."""
-    out = image.copy()
+def draw_single_box(pil_img: Image.Image, box, conf: float) -> Image.Image:
+    """Draw ONE yellow bounding box using Pillow."""
+    out  = pil_img.copy().convert("RGB")
+    draw = ImageDraw.Draw(out)
     x1, y1, x2, y2 = map(int, box)
-    cv2.rectangle(out, (x1, y1), (x2, y2), YELLOW, 3)
-    label = f"PAN Card  {conf:.0%}"
-    scale = 0.65
-    thick = 2
-    (tw, th), _ = cv2.getTextSize(label, FONT, scale, thick)
-    pad = 6
-    cv2.rectangle(out, (x1, y1 - th - pad*2), (x1 + tw + pad*2, y1), YELLOW, -1)
-    cv2.putText(out, label, (x1 + pad, y1 - pad), FONT, scale, BLACK, thick, cv2.LINE_AA)
+
+    # Yellow box
+    for t in range(3):
+        draw.rectangle([x1-t, y1-t, x2+t, y2+t], outline=(0, 220, 220))
+
+    # Label background + text
+    label    = f"PAN Card  {conf:.0%}"
+    fontsize = max(16, int((x2 - x1) / 10))
+    try:
+        font = ImageFont.truetype("arial.ttf", fontsize)
+    except Exception:
+        font = ImageFont.load_default()
+
+    bbox    = draw.textbbox((0, 0), label, font=font)
+    tw, th  = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    pad     = 6
+    draw.rectangle([x1, y1 - th - pad*2, x1 + tw + pad*2, y1], fill=(0, 220, 220))
+    draw.text((x1 + pad, y1 - th - pad), label, fill=(0, 0, 0), font=font)
     return out
 
 
-def draw_not_pan(image: np.ndarray) -> np.ndarray:
-    out = image.copy()
-    h, w = out.shape[:2]
-    overlay = out.copy()
-    cv2.rectangle(overlay, (0, 0), (w, h), (0, 0, 180), -1)
-    cv2.addWeighted(overlay, 0.40, out, 0.60, 0, out)
-    msg   = "Not a PAN Card"
-    scale = min(w, h) / 380
-    thick = max(2, int(scale * 2))
-    (tw, th), _ = cv2.getTextSize(msg, FONT, scale, thick)
-    x, y = (w - tw) // 2, (h + th) // 2
-    cv2.putText(out, msg, (x+2, y+2), FONT, scale, BLACK,  thick+2, cv2.LINE_AA)
-    cv2.putText(out, msg, (x,   y),   FONT, scale, WHITE,  thick,   cv2.LINE_AA)
+def draw_not_pan(pil_img: Image.Image) -> Image.Image:
+    """Red overlay with 'Not a PAN Card' text using Pillow."""
+    out  = pil_img.copy().convert("RGBA")
+    w, h = out.size
+
+    # Semi-transparent red overlay
+    overlay = Image.new("RGBA", (w, h), (180, 0, 0, 100))
+    out     = Image.alpha_composite(out, overlay).convert("RGB")
+
+    draw     = ImageDraw.Draw(out)
+    msg      = "Not a PAN Card"
+    fontsize = max(20, min(w, h) // 12)
+    try:
+        font = ImageFont.truetype("arial.ttf", fontsize)
+    except Exception:
+        font = ImageFont.load_default()
+
+    bbox   = draw.textbbox((0, 0), msg, font=font)
+    tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    x      = (w - tw) // 2
+    y      = (h - th) // 2
+
+    # Shadow
+    draw.text((x+2, y+2), msg, fill=(0, 0, 0), font=font)
+    # White text
+    draw.text((x, y),     msg, fill=(255, 255, 255), font=font)
     return out
-
-
-def pil_to_bgr(img: Image.Image) -> np.ndarray:
-    return cv2.cvtColor(np.array(img.convert("RGB")), cv2.COLOR_RGB2BGR)
-
-
-def bgr_to_pil(bgr: np.ndarray) -> Image.Image:
-    return Image.fromarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB))
 
 
 def img_to_bytes(img: Image.Image) -> bytes:
     buf = io.BytesIO()
     img.save(buf, format="JPEG", quality=92)
     return buf.getvalue()
+
+
+def load_model(path: str):
+    try:
+        from ultralytics import YOLO
+        return YOLO(path)
+    except Exception:
+        return None
 
 
 # ── Session state ──────────────────────────────────────────────────────────────
@@ -228,7 +197,7 @@ st.markdown(f"""
 # ── Two columns ────────────────────────────────────────────────────────────────
 col_left, col_right = st.columns([1, 1], gap="small")
 
-# ── LEFT: Upload ───────────────────────────────────────────────────────────────
+# ── LEFT ──────────────────────────────────────────────────────────────────────
 with col_left:
     st.markdown('<div class="panel">', unsafe_allow_html=True)
     st.markdown('<div class="panel-label">01 — Upload Image</div>', unsafe_allow_html=True)
@@ -258,7 +227,6 @@ with col_left:
             <div class="meta-item"><div class="meta-key">Format</div><div class="meta-val">{uploaded.type.split('/')[-1].upper()}</div></div>
         </div>""", unsafe_allow_html=True)
 
-        # ── Medium sized input image ──
         st.image(pil_img, width=380, caption="Input image")
 
         st.markdown("<hr>", unsafe_allow_html=True)
@@ -269,42 +237,41 @@ with col_left:
             value="runs/detect/pancard_detector6/weights/best.pt",
         )
 
-        conf_thresh = 0.20  # fixed threshold
+        conf_thresh = 0.20
 
         st.markdown("<br>", unsafe_allow_html=True)
         detect_btn = st.button("🔎  Run Detection", type="primary", use_container_width=True)
 
         if detect_btn:
-            bgr = pil_to_bgr(pil_img)
             # Downscale large images
-            ih, iw = bgr.shape[:2]
-            if max(ih, iw) > 1200:
-                scale = 1200 / max(ih, iw)
-                bgr   = cv2.resize(bgr, (int(iw*scale), int(ih*scale)))
+            max_dim = 1200
+            if max(w, h) > max_dim:
+                scale   = max_dim / max(w, h)
+                pil_img = pil_img.resize((int(w*scale), int(h*scale)), Image.LANCZOS)
 
             with st.spinner("Analysing…"):
-                t_start = time.time()
-                model   = load_model(weights_path)
+                t_start      = time.time()
+                model        = load_model(weights_path)
                 pan_detected = False
                 top_conf     = 0.0
-                out_bgr      = bgr.copy()
+                out_img      = pil_img.copy()
 
                 if model:
-                    results  = model.predict(bgr, conf=conf_thresh, verbose=False)
+                    img_array = np.array(pil_img.convert("RGB"))
+                    results   = model.predict(img_array, conf=conf_thresh, verbose=False)
                     all_boxes = results[0].boxes
                     pan_dets  = [b for b in all_boxes
                                  if model.names[int(b.cls[0])] == "pancard"]
 
                     if pan_dets:
-                        # ── Keep ONLY the best detection ──
-                        best_box  = max(pan_dets, key=lambda b: float(b.conf[0]))
-                        top_conf  = float(best_box.conf[0])
+                        best_box     = max(pan_dets, key=lambda b: float(b.conf[0]))
+                        top_conf     = float(best_box.conf[0])
                         pan_detected = True
-                        out_bgr   = draw_single_box(
-                            bgr, best_box.xyxy[0].cpu().numpy(), top_conf
+                        out_img      = draw_single_box(
+                            pil_img, best_box.xyxy[0].cpu().numpy(), top_conf
                         )
                     else:
-                        out_bgr = draw_not_pan(bgr)
+                        out_img = draw_not_pan(pil_img)
                 else:
                     st.error("Model not found — check weights path.")
 
@@ -318,15 +285,15 @@ with col_left:
                 "detected": pan_detected,
                 "conf":     top_conf,
                 "elapsed":  elapsed,
-                "size":     f"{bgr.shape[1]}×{bgr.shape[0]}",
+                "size":     f"{pil_img.width}×{pil_img.height}",
             }
-            st.session_state.output_img = bgr_to_pil(out_bgr)
+            st.session_state.output_img = out_img
             st.rerun()
 
     st.markdown('</div>', unsafe_allow_html=True)
 
 
-# ── RIGHT: Results ─────────────────────────────────────────────────────────────
+# ── RIGHT ──────────────────────────────────────────────────────────────────────
 with col_right:
     st.markdown('<div class="panel panel-right">', unsafe_allow_html=True)
     st.markdown('<div class="panel-label">03 — Detection Result</div>', unsafe_allow_html=True)
@@ -378,9 +345,7 @@ with col_right:
         st.markdown('<div class="panel-label">04 — Output Image</div>', unsafe_allow_html=True)
 
         if st.session_state.output_img:
-            # ── Medium sized output image ──
             st.image(st.session_state.output_img, width=380, caption="Detection result")
-
             st.download_button(
                 label="⬇  Download Result",
                 data=img_to_bytes(st.session_state.output_img),
@@ -394,9 +359,8 @@ with col_right:
 # ── Footer ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div style="border-top:1px solid #1E2D4A; padding:1rem 3rem;
-     display:flex; justify-content:space-between;
-     background:#0A0F1C; margin-top:1rem;">
+     display:flex; justify-content:space-between; background:#0A0F1C; margin-top:1rem;">
   <span style="font-size:11px;color:#2A3D5E;font-family:'Space Mono',monospace;">PAN CARD DETECTOR v1.0</span>
-  <span style="font-size:11px;color:#2A3D5E;">YOLOv8 · OpenCV · Streamlit</span>
+  <span style="font-size:11px;color:#2A3D5E;">YOLOv8 · Pillow · Streamlit</span>
 </div>
 """, unsafe_allow_html=True)

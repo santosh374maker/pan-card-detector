@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![YOLOv8](https://img.shields.io/badge/YOLOv8-Ultralytics-FF6B35?style=for-the-badge&logo=yolo&logoColor=white)](https://ultralytics.com)
 [![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
-[![OpenCV](https://img.shields.io/badge/OpenCV-4.8%2B-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)](https://opencv.org)
+[![Pillow](https://img.shields.io/badge/Pillow-9.0%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://pillow.readthedocs.io)
 [![License](https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge)](LICENSE)
 
 <br/>
@@ -16,7 +16,6 @@
 
 <br/>
 
-<!-- Replace the line below with your actual GIF once you have it -->
 ![Demo GIF](assets/demo.gif)
 
 <br/>
@@ -27,14 +26,12 @@
 
 ## 📺 Demo Video
 
-<!-- Replace the URL below with your actual YouTube video link -->
 [![Watch Demo on YouTube](https://img.shields.io/badge/Watch%20Demo-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/your-video-link)
 
 ---
 
 ## 📸 Screenshots
 
-<!-- Replace with your actual screenshots -->
 | Input | Output — PAN Card | Output — Not PAN Card |
 |---|---|---|
 | ![input](assets/screenshot_input.jpg) | ![pan](assets/screenshot_pan.jpg) | ![notpan](assets/screenshot_notpan.jpg) |
@@ -75,16 +72,16 @@ Yellow bbox       Red overlay +
 ## 🗂️ Project Structure
 
 ```
-project_yolo/
+pan-card-detector/
 ├── dataset/
 │   ├── images/
 │   │   ├── all/          ← all augmented images
-│   │   ├── train/        ← training split (auto)
-│   │   └── test/         ← test split (auto)
+│   │   ├── train/        ← training split (auto-filled)
+│   │   └── test/         ← test split (auto-filled)
 │   └── labels/
 │       ├── all/          ← all YOLO label .txt files
-│       ├── train/        ← train labels (auto)
-│       └── test/         ← test labels (auto)
+│       ├── train/        ← train labels (auto-filled)
+│       └── test/         ← test labels (auto-filled)
 ├── runs/
 │   └── detect/
 │       └── pancard_detector6/
@@ -94,18 +91,18 @@ project_yolo/
 │   └── yolov8n.pt            ← pretrained base weights
 ├── raw_images/
 │   ├── pan_cards/            ← original PAN card photos
-│   ├── aadhaar/              ← Aadhaar card photos (negatives)
+│   ├── aadhaar/              ← Aadhaar photos (negatives)
 │   └── other_ids/            ← other ID photos (negatives)
 ├── output/                   ← detect.py saves results here
+├── assets/                   ← demo GIF and screenshots
 ├── app.py                    ← Streamlit web app
 ├── augment.py                ← image augmentation script
 ├── setup_folders.py          ← folder setup + train/test split
-├── fix_all.py                ← image corruption fix script
-├── fix_labels.py             ← label class ID fix script
 ├── train.py                  ← YOLO training script
 ├── detect.py                 ← CLI inference script
 ├── data.yaml                 ← YOLO dataset config
-└── requirements.txt
+├── requirements.txt
+└── README.md
 ```
 
 ---
@@ -114,7 +111,7 @@ project_yolo/
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/pan-card-detector.git
+git clone https://github.com/santosh374maker/pan-card-detector.git
 cd pan-card-detector
 ```
 
@@ -211,6 +208,11 @@ python detect.py --weights "runs/detect/pancard_detector6/weights/best.pt" --inp
 4. Set main file → `app.py`
 5. Click **Deploy**
 
+### Local
+```bash
+streamlit run app.py
+```
+
 ---
 
 ## 🛠️ Tech Stack
@@ -218,19 +220,18 @@ python detect.py --weights "runs/detect/pancard_detector6/weights/best.pt" --inp
 | Tool | Purpose |
 |---|---|
 | [YOLOv8](https://ultralytics.com) | Object detection model |
-| [OpenCV](https://opencv.org) | Image processing + drawing |
+| [Pillow](https://pillow.readthedocs.io) | Image processing + drawing |
 | [Streamlit](https://streamlit.io) | Web application framework |
 | [NumPy](https://numpy.org) | Array operations |
-| [Pillow](https://pillow.readthedocs.io) | Image format handling |
 | [LabelImg](https://github.com/HumanSignal/labelImg) | Manual image annotation |
 
 ---
 
 ## ⭐ Show Your Support
 
-If this project helped you, please consider giving it a **star** on GitHub!
+If this project helped you, please consider giving it a **star** on GitHub — it means a lot and helps others discover the project!
 
-[![Star on GitHub](https://img.shields.io/github/stars/YOUR_USERNAME/pan-card-detector?style=social)](https://github.com/YOUR_USERNAME/pan-card-detector)
+[![Star on GitHub](https://img.shields.io/github/stars/santosh374maker/pan-card-detector?style=social)](https://github.com/santosh374maker/pan-card-detector)
 
 ---
 
@@ -240,7 +241,7 @@ If this project helped you, please consider giving it a **star** on GitHub!
 
 **S Santosh Achary**
 
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/YOUR_USERNAME)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/santosh374maker)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/YOUR_PROFILE)
 [![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/YOUR_CHANNEL)
 
@@ -257,5 +258,5 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 ---
 
 <div align="center">
-  <sub>Made by <a href="https://github.com/YOUR_USERNAME">S Santosh Achary</a></sub>
+  <sub>Made by <a href="https://github.com/santosh374maker">S Santosh Achary</a></sub>
 </div>
