@@ -257,8 +257,7 @@ with col_left:
                 out_img      = pil_img.copy()
 
                 if model:
-                    img_rgb   = np.array(pil_img.convert("RGB"))
-                    img_array = img_rgb[:, :, ::-1]  # RGB → BGR for YOLO)
+                    img_array = np.array(pil_img.convert("RGB"))
                     results   = model.predict(img_array, conf=conf_thresh, verbose=False)
                     all_boxes = results[0].boxes
                     pan_dets  = [b for b in all_boxes
