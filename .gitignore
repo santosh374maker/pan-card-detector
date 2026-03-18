@@ -1,0 +1,26 @@
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Dataset (too large for GitHub)
+dataset/
+raw_images/
+
+# Old training runs (keep only best.pt)
+runs/detect/pancard_detector/
+runs/detect/pancard_detector2/
+runs/detect/pancard_detector3/
+runs/detect/pancard_detector4/
+runs/detect/pancard_detector5/
+
+# Cache files
+__pycache__/
+*.cache
+*.pyc
+
+# Output images
+output/
+
+# YOLO base weights
+yolo_weights/
